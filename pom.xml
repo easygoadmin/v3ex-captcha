@@ -2,109 +2,174 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <groupId>io.github.v6ex</groupId>
-
-    <artifactId>v3ex-captcha</artifactId>
+    <artifactId>v6ex-captcha</artifactId>
     <version>1.0.0</version>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>8</source>
-                    <target>8</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+    <name>v6ex-captcha</name>
+    <description>验证码工具</description>
+    <!-- 1. url必须要有，不然远程提交时会返回错误 -->
+    <url>https://github.com/v6ex/v6ex-captcha</url>
+    <properties>
+        <java.version>1.8</java.version>
+    </properties>
     <packaging>jar</packaging>
 
-    <name>v3ex-captcha</name>
-    <description>Java web graphics verification code, support gif verification code.</description>
-    <url>https://github.com/easygoadmin/v3ex-captcha</url>
-
+    <!-- 2. 开源证书 -->
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
             <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
         </license>
     </licenses>
+    <!-- 3. 源码仓库信息 -->
+    <scm>
+        <connection>scm:git:git@github.com:v6ex/v6ex-captcha.git</connection>
+        <developerConnection>scm:git:git@github.com:v6ex/v6ex-captcha.git</developerConnection>
+        <url>https://github.com/v6ex/v6ex-captcha/tree/main</url>
+    </scm>
+    <!-- 4. 开发人员信息 -->
     <developers>
         <developer>
             <name>javaweb</name>
             <email>javaweb520@gmail.com</email>
+            <organization>https://github.com/v6ex</organization>
+            <timezone>+8</timezone>
         </developer>
     </developers>
-    <scm>
-        <connection>scm:git@github.com:easygoadmin/v3ex-captcha.git</connection>
-        <developerConnection>scm:git@github.com:easygoadmin/v3ex-captcha.git</developerConnection>
-        <url>https://github.com/easygoadmin/v3ex-captcha</url>
-    </scm>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>1.8</java.version>
-    </properties>
+    <!-- 5. 上传的仓库地址，以及使用哪个账号密码配置 -->
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
 
     <dependencies>
-        <!-- j2ee环境 -->
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>3.1.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-            <scope>test</scope>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.24</version>
         </dependency>
     </dependencies>
+
+    <build>
+        <!-- 配置好每个插件的属性 -->
+        <pluginManagement>
+            <plugins>
+                <!-- 6. 上传到sonatype的插件 -->
+                <plugin>
+                    <groupId>org.sonatype.plugins</groupId>
+                    <artifactId>nexus-staging-maven-plugin</artifactId>
+                    <version>1.6.7</version>
+                    <extensions>true</extensions>
+                    <configuration>
+                        <!-- 这里的id必须要和全局配置中的server一致 -->
+                        <serverId>ossrh</serverId>
+                        <!-- 这个地址，一定要和issue的评论中给出的地址一致！ -->
+                        <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+                        <!-- 如果希望发布后自动执行close和release操作，此处可以调整为true -->
+                        <autoReleaseAfterClose>false</autoReleaseAfterClose>
+                    </configuration>
+                </plugin>
+
+                <!-- 7. 上传源码的插件 -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>3.1.0</version>
+                    <inherited>true</inherited>
+                    <executions>
+                        <execution>
+                            <id>attach-sources</id>
+                            <goals>
+                                <goal>jar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <excludeResources>true</excludeResources>
+                        <useDefaultExcludes>true</useDefaultExcludes>
+                    </configuration>
+                </plugin>
+
+                <!-- 8. 生成doc文档的插件 -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>3.0.0</version>
+                    <inherited>true</inherited>
+                    <executions>
+                        <execution>
+                            <id>bundle-sources</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>jar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <maxmemory>1024</maxmemory>
+                        <encoding>UTF-8</encoding>
+                        <show>protected</show>
+                        <notree>true</notree>
+
+                        <!-- Avoid running into Java 8's very restrictive doclint issues -->
+                        <failOnError>false</failOnError>
+                        <doclint>none</doclint>
+                    </configuration>
+                </plugin>
+
+                <!-- 9. 编译构建maven工程的插件 -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <source>1.8</source>
+                        <target>1.8</target>
+                        <encoding>UTF-8</encoding>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <!-- 10. 确定要使用哪些插件 -->
+        <plugins>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 
     <profiles>
         <profile>
             <id>release</id>
             <build>
                 <plugins>
-                    <!-- Source -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                        <version>2.2.1</version>
-                        <executions>
-                            <execution>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>jar-no-fork</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <!-- Javadoc -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>2.9.1</version>
-                        <executions>
-                            <execution>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <!-- GPG -->
+                    <!-- 11. 生成签名，确定使用那个gpg秘钥 -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
                         <version>1.5</version>
                         <executions>
                             <execution>
+                                <!-- 必须和配置中的gpg校验id一致 -->
+                                <id>gpg</id>
                                 <phase>verify</phase>
                                 <goals>
                                     <goal>sign</goal>
@@ -114,16 +179,6 @@
                     </plugin>
                 </plugins>
             </build>
-            <distributionManagement>
-                <snapshotRepository>
-                    <id>oss</id>
-                    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-                </snapshotRepository>
-                <repository>
-                    <id>oss</id>
-                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-                </repository>
-            </distributionManagement>
         </profile>
     </profiles>
 
